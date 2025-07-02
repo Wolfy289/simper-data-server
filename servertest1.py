@@ -9,8 +9,12 @@ connected_clients = set()
 
 @app.route('/')
 def index():
-    return "<a href='/static/index.html'>text</a><br><a href='/api'>input</a>",app.send_static_file('index.html')
+    return "<a href='/static/index.html'>text</a><br><a href='/api'>input</a>"
 
+@app.route('/text')
+def main():
+    app.send_static_file('index.html')
+    
 @app.route('/api')
 def handle_data():
     data = request.args.get('data')
