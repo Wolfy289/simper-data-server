@@ -15,8 +15,8 @@ def index():
 def handle_data():
     data = request.args.get('data')
     name = request.args.get('name')
-    data = name + "|" + data
-    if data:
+    if data and name:
+        data = name + "|" + data
         print(f"{name,data}")
         regel = f"\n{nu_time()}|{data}"
 
