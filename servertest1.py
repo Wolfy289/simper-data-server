@@ -1,7 +1,9 @@
-from flask import Flask, request, send_from_directory
+from flask import Flask, request
+from flask_socketio import SocketIO, emit
 from datetime import datetime
 
 app = Flask(__name__, static_folder='static')
+socketio = SocketIO(app)
 
 @app.route('/')
 def index():
@@ -12,21 +14,27 @@ def handle_data():
     data = request.args.get('data')
     if data:
         print(f"Ontvangen data: {data}")
-        add_data("data.txt",data)
-        
-        return f"{data}"
+        add_data("data.txt", data)
+        return str(data)
     else:
         return "?data=...."
 
+@socketio.on('connect')
+def handle_connect():
+    print("Client connected")
 
-def read_data(bestant):
-    with open(bestant, "r") as bestand:
-        inhoud = bestand.read()
+def read_data(bestand):
+    with open(bestand, "r") as f:
+        inhoud = f.read()
     return inhoud
 
-def add_data(bestant,data):
-    with open(bestant, "a") as bestand:
-        bestand.write("\n"+nu_time()+'|'+str(data))
+def add_data(bestand, data):
+    tijd = nu_time()
+    regel = "\n" + tijd + '|' + str(data)
+    with open(bestand, "a") as f:
+        f.write(regel)
+    # Zend naar alle websocket clients
+    socketio.emit('server_time', regel.replace("\n", "<br>"))
 
 def nu_time():
     nu = datetime.now()
@@ -36,9 +44,8 @@ def nu_time():
     seconden = nu.second
     milliseconden = int(nu.microsecond / 10000)
 
-    tijd_string = f"{dagen}:{uren:02}:{minuten:02}:{seconden:02}:{milliseconden:02}"
-    return tijd_string
-
+    return f"{dagen}:{uren:02}:{minuten:02}:{seconden:02}:{milliseconden:02}"
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8000)
+    socketio.run(app, debug=True, host='0.0.0.0', port=8000)
+
