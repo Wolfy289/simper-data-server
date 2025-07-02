@@ -17,8 +17,8 @@ def handle_data():
     name = request.args.get('name')
     if data and name:
         data = name + "|" + data
-        print(f"{name,data}")
-        regel = f"\n{nu_time()}|{data}"
+        print(data)
+        regel = str(nu_time())+"|"+data
 
         stuur_socket_data(regel)
 
