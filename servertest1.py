@@ -9,7 +9,7 @@ connected_clients = set()
 
 @app.route('/')
 def index():
-    return "<a href='/static/index.html'>text</a><br><a href='/api'>input</a>"
+    return "<a href='/static/index.html'>text</a><br><a href='/api'>input</a>",app.send_static_file('index.html')
 
 @app.route('/api')
 def handle_data():
